@@ -1,8 +1,7 @@
 # WebRTC-Practice
 WebRTC Homepage ([WebRTC](https://webrtc.org/))
 
-> webcam으로 video를 얻고, snapshots을 찍고 WebRTC를 통해 P2P를 공유하는 App Build
-<br>
+> webcam으로 video를 얻고, snapshots을 찍고 WebRTC를 통해 P2P를 공유하는 App Build   
 위 과정에서 핵심 WebRTC API를 사용하고 Node.js를 사용하여 messaging server를 설정하는 방법을 배움
 
 <br>
