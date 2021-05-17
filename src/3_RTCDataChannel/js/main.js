@@ -1,16 +1,26 @@
+// 아래 코드는 RTCPeerConnection 및 RTCDataChannel을 사용하여 텍스트 메시지 교환을 활성화
+// 2개의 WebRTC peer간의 연걸을 설정
+// peer간에 text data 교환
+
 'use strict';
 
-var localConnection;
-var remoteConnection;
-var sendChannel;
-var receiveChannel;
-var pcConstraint;
-var dataConstraint;
-var dataChannelSend = document.querySelector('textarea#dataChannelSend');
-var dataChannelReceive = document.querySelector('textarea#dataChannelReceive');
-var startButton = document.querySelector('button#startButton');
-var sendButton = document.querySelector('button#sendButton');
-var closeButton = document.querySelector('button#closeButton');
+let localConnection;
+let remoteConnection;
+let sendChannel;
+let receiveChannel;
+let pcConstraint;
+// dataConstraint
+// Data channel은 다양한 유형의 데이터 공유를 가능하도록 channel 구성 가능
+// 성능보다 안정적인 전달 우선
+// RTCPeerConnection - https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/RTCPeerConnection
+// RTCDataChannel - https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/createDataChannel
+// getUserMedia() - https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getUserMedia
+let dataConstraint;
+let dataChannelSend = document.querySelector('textarea#dataChannelSend');
+let dataChannelReceive = document.querySelector('textarea#dataChannelReceive');
+let startButton = document.querySelector('button#startButton');
+let sendButton = document.querySelector('button#sendButton');
+let closeButton = document.querySelector('button#closeButton');
 
 startButton.onclick = createConnection;
 sendButton.onclick = sendData;
@@ -26,29 +36,28 @@ function disableSendButton() {
 
 function createConnection() {
   dataChannelSend.placeholder = '';
-  var servers = null;
+  let servers = null;
   pcConstraint = null;
   dataConstraint = null;
+
   trace('Using SCTP based data channels');
-  // For SCTP, reliable and ordered delivery is true by default.
-  // Add localConnection to global scope to make it visible
-  // from the browser console.
+  // SCTP의 경우 신뢰할 수 있고 순서가 지정된 delivery는 기본적으로 true
+  // 전역 범위에 localConnection을 추가하여 브라우저 콘솔에서 볼 수 있도록 함
   window.localConnection = localConnection =
-      new RTCPeerConnection(servers, pcConstraint);
+    new RTCPeerConnection(servers, pcConstraint);
   trace('Created local peer connection object localConnection');
 
   sendChannel = localConnection.createDataChannel('sendDataChannel',
-      dataConstraint);
+    dataConstraint);
   trace('Created send data channel');
 
   localConnection.onicecandidate = iceCallback1;
   sendChannel.onopen = onSendChannelStateChange;
   sendChannel.onclose = onSendChannelStateChange;
 
-  // Add remoteConnection to global scope to make it visible
-  // from the browser console.
+  // remoteConnection을 전역 범위에 추가하여 브라우저 콘솔에서 볼 수 있도록 함
   window.remoteConnection = remoteConnection =
-      new RTCPeerConnection(servers, pcConstraint);
+    new RTCPeerConnection(servers, pcConstraint);
   trace('Created remote peer connection object remoteConnection');
 
   remoteConnection.onicecandidate = iceCallback2;
@@ -67,7 +76,7 @@ function onCreateSessionDescriptionError(error) {
 }
 
 function sendData() {
-  var data = dataChannelSend.value;
+  let data = dataChannelSend.value;
   sendChannel.send(data);
   trace('Sent Data: ' + data);
 }
@@ -157,7 +166,7 @@ function onReceiveMessageCallback(event) {
 }
 
 function onSendChannelStateChange() {
-  var readyState = sendChannel.readyState;
+  let readyState = sendChannel.readyState;
   trace('Send channel state is: ' + readyState);
   if (readyState === 'open') {
     dataChannelSend.disabled = false;
@@ -172,7 +181,7 @@ function onSendChannelStateChange() {
 }
 
 function onReceiveChannelStateChange() {
-  var readyState = receiveChannel.readyState;
+  let readyState = receiveChannel.readyState;
   trace('Receive channel state is: ' + readyState);
 }
 
@@ -181,7 +190,7 @@ function trace(text) {
     text = text.substring(0, text.length - 1);
   }
   if (window.performance) {
-    var now = (window.performance.now() / 1000).toFixed(3);
+    let now = (window.performance.now() / 1000).toFixed(3);
     console.log(now + ': ' + text);
   } else {
     console.log(text);
